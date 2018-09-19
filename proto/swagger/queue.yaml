@@ -1,0 +1,130 @@
+paths:
+  /queue:
+    put:
+      tags:
+        - Queue
+      summary: Create or modify a queue
+      description: Create or modify a queue, existing hosts won't be affected
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      parameters:
+      - name: queue
+        description: Queue name
+        in: body
+        schema:
+          $ref: "queue.yaml#/definitions/queue"
+        required: true
+      responses:
+        200:
+          description: Queue name
+          schema:
+            type: object
+            required:
+            - queueName
+            properties:
+              queueName:
+                type: string
+                x-isnullable: false
+        default:
+          $ref: "common.yaml#/responses/errorResponse"
+
+    delete:
+      tags:
+      - Queue
+      summary: Delete a queue
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      parameters:
+      - name: queue
+        description: Queue name to delete
+        in: query
+        type: string
+        required: true
+      responses:
+        200:
+          description: Successful removal
+        default:
+          $ref: "common.yaml#/responses/errorResponse"
+
+  /queue/list:
+    get:
+      tags:
+        - Queue
+      summary: List existing queues
+      description: List existing queues and their attached instances
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      parameters:
+      - name: queue
+        description: Queue name to check
+        in: query
+        type: string
+        x-isnullable: false
+      responses:
+        200:
+          description: Queue name
+          schema:
+            description: Queue description
+            type: array
+            items:
+              type: object
+              description: Queue information
+              required:
+              - hostCount
+              - queueInfo
+              properties:
+                hostCount:
+                  type: integer
+                  x-isnullable: false
+                queueInfo:
+                  $ref: "queue.yaml#/definitions/queue"
+        default:
+          $ref: "common.yaml#/responses/errorResponse"
+
+
+definitions:
+  queue:
+    type: object
+    #x-isnullable: false
+    required:
+    - name
+    - launchTemplateId
+    - instanceTypes
+    - dockerRepository
+    - dockerLogin
+    - dockerPassword
+    properties:
+      name:
+        description: Queue name
+        type: string
+        x-isnullable: false
+      launchTemplateId:
+        description: Launch template to use
+        type: string
+        x-isnullable: false
+      instanceTypes:
+        type: array
+        description: Comma-separated allowed instance types
+        items:
+          type: string
+          x-isnullable: false
+        x-isnullable: false
+        minItems: 1
+      dockerRepository:
+        description: Docker repository
+        type: string
+        x-isnullable: false
+      dockerLogin:
+        description: Docker repository login
+        type: string
+        x-isnullable: false
+      dockerPassword:
+        description: Password to use for the repository
+        type: string
+        x-isnullable: false

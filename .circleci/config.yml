@@ -1,0 +1,68 @@
+version: 2
+jobs:
+  build:
+    working_directory: /go/src/apollo
+    docker:
+      - image: circleci/golang:1.10.0
+    environment:
+      - GOCACHE: "/tmp/go/cache"
+      - DEP_VERSION: 0.5.0
+      - TEST_RESULTS: /tmp/test-results
+    steps:
+      - run:
+          name: Avoid hosts unknown for github
+          command: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run:
+          name: Install System Dependencies
+          command: sudo apt-get update && sudo apt-get install -y openjdk-8-jdk
+      - checkout
+      - run:
+          name: "Pull Submodules"
+          command: |
+            cd /go/src/apollo      
+            git submodule init
+            git submodule update --remote
+      - run: mkdir -p $TEST_RESULTS
+      - restore_cache:
+          key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.toml" }}
+          paths:
+              - /go/src/apollo/vendor
+      - run:
+          name: download-libraries
+          command: |
+            if [ ! -d /go/src/apollo/vendor ]; then
+                curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o /go/bin/dep
+                chmod +x /go/bin/dep
+                /go/bin/dep ensure
+            fi
+      - save_cache:
+          key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.toml" }}
+          paths:
+              - /go/src/apollo/vendor
+      - restore_cache:
+          keys:
+              - build-cache-{{ .Branch }}-{{ .Environment.CIRCLE_PREVIOUS_BUILD_NUM }}
+          paths:
+              - /tmp/go/cache
+      - run:
+          name: generate
+          command: go generate ./...
+      - run:
+          name: compile
+          command: |
+            mkdir -p $GOCACHE
+            go build -v cmd/aposerver/aposerver.go
+      - run:
+          name: test
+          command: |
+            trap "go run vendor/github.com/jstemmer/go-junit-report/go-junit-report.go <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
+            go test -v ./... | tee ${TEST_RESULTS}/go-test.out
+      - save_cache:
+          key: build-cache-{{ .Branch }}-{{ .Environment.CIRCLE_BUILD_NUM }}
+          paths:
+            - /tmp/go/cache
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: raw-test-output
+      - store_test_results:
+          path: /tmp/test-results

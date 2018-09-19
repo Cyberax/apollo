@@ -1,0 +1,218 @@
+paths:
+  /task:
+    put:
+      tags:
+        - Task
+      summary: Submit a task array
+      description: Submit a task array for execution
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      parameters:
+      - name: task
+        description: Task to run
+        in: body
+        schema:
+          $ref: "task.yaml#/definitions/taskStruct"
+        required: true
+      responses:
+        200:
+          description: Task ID
+          headers:
+            X-Request-Id:
+              description: The request id for tracing
+              type: string
+          schema:
+            type: object
+            required:
+            - taskId
+            properties:
+              taskId:
+                type: string
+                x-isnullable: false
+        default:
+          $ref: "common.yaml#/responses/errorResponse"
+
+  /task/list:
+    get:
+      tags:
+        - Task
+      summary: List tasks
+      description: List current tasks
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      parameters:
+      - name: "queue"
+        description: Filter by queue name
+        in: query
+        type: string
+        required: false
+      - name: "job"
+        description: Filter by job name
+        in: query
+        type: string
+        required: false
+      - name: "with-env"
+        description: Retrieve environment
+        in: query
+        type: boolean
+        default: false
+        required: false
+      - name: "id"
+        in: query
+        description: Filter by task ID
+        required: false
+        type: array
+        items:
+          type: string
+      responses:
+        200:
+          description: List of tasks
+          schema:
+            description: Task descriptions
+            type: array
+            items:
+              type: object
+              description: Task Information
+              required:
+              - taskId
+              - taskStruct
+              properties:
+                taskId:
+                  type: string
+                  x-isnullable: false
+                jobFailedTaskCount:
+                  type: integer
+                taskStruct:
+                  $ref: "swagger.yaml#/definitions/taskStruct"
+                  x-isnullable: true
+                instanceStatus:
+                  type: object
+                  required:
+                    - status
+                    - instances
+                  properties:
+                    status:
+                      type: string
+                      x-isnullable: false
+                    instances:
+                      type: array
+                      minLength: 1
+                      x-isnullable: false
+                      items:
+                        type: integer
+        default:
+          $ref: "common.yaml#/responses/errorResponse"
+
+
+definitions:
+  TaskStateEnum:
+    type: string
+    enum: &TaskStateEnum
+    - waiting
+    - scheduled
+    - running
+    - done
+
+  taskStatus:
+    type: object
+    properties:
+      taskId:
+        type: string
+      taskState:
+        type: string
+        enum: *TaskStateEnum
+
+  job:
+    type: object
+    properties:
+      job-name:
+        type: string
+        x-isnullable: false
+      max-failed-count:
+        type: integer
+        description: Maximum number of failed task instances before the job is failed (-1 is no limit)
+        default: -1
+        minimum: -1
+        x-isnullable: false
+
+  taskStruct:
+    description: The submitted task
+    properties:
+      queue:
+        type: string
+        x-isnullable: false
+        minLength: 1
+      pwd:
+        type: string
+        x-isnullable: false
+        minLength: 1
+        default: "/tmp"
+      cmdline:
+        type: array
+        items:
+          type: string
+        minLength: 1
+      start-array-index:
+        type: integer
+        default: 0
+        minimum: 0
+        x-isnullable: false
+      end-array-index:
+        type: integer
+        default: 1
+        minimum: 1
+        x-isnullable: false
+      job:
+        $ref: "swagger.yaml#/definitions/job"
+        x-isnullable: true
+      task-dependencies:
+        type: array
+        items:
+          type: string
+      subtask-dependencies:
+        type: array
+        items:
+          type: string
+      max-ram-mb:
+        type: integer
+        default: 1024
+        x-isnullable: false
+        minimum: 1
+      expected-ram-mb:
+        type: integer
+        default: 1024
+        x-isnullable: false
+        minimum: 1
+      docker-image-id:
+        type: string
+        x-isnullable: false
+        minLength: 1
+      repo:
+        type: string
+        x-isnullable: false
+      task-env:
+        type: object
+        additionalProperties:
+          type: string
+      can-use-all-cpus:
+        type: boolean
+        x-isnullable: false
+        default: false
+      timeout-seconds:
+        type: integer
+        default: 600
+        minimum: 1
+        x-isnullable: false
+      retries:
+        type: integer
+        default: 3
+        minimum: 0
+        x-isnullable: false
+      tags:
+        type: object
+        additionalProperties:
+          type: string

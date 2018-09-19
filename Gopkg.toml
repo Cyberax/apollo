@@ -1,0 +1,146 @@
+
+# Gopkg.toml example
+#
+# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
+# for detailed Gopkg.toml documentation.
+#
+# required = ["github.com/user/thing/cmd/thing"]
+# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
+#
+# [[constraint]]
+#   name = "github.com/user/project"
+#   version = "1.0.0"
+#
+# [[constraint]]
+#   name = "github.com/user/project2"
+#   branch = "dev"
+#   source = "github.com/myfork/project2"
+#
+# [[override]]
+#  name = "github.com/x/y"
+#  version = "2.4.0"
+
+required = ["github.com/petergtz/pegomock",
+    "github.com/stretchr/testify", "gopkg.in/alecthomas/kingpin.v2",
+    "github.com/jarcoal/httpmock",
+
+    "github.com/juju/errors.git",
+    "github.com/spf13/cobra/cobra",
+    "github.com/spf13/viper",
+    "github.com/hashicorp/go-hclog",
+    "github.com/sirupsen/logrus",
+
+    "github.com/go-swagger/go-swagger",
+    "github.com/go-openapi/runtime",
+    "github.com/go-openapi/inflect",
+    "github.com/gorilla/handlers",
+    "github.com/toqueteos/webbrowser",
+
+    "github.com/docker/docker/client",  # Docker APId
+
+    "github.com/cloudfoundry/gosigar", # System info
+
+    "github.com/olekukonko/tablewriter", # Tabulated output
+
+    "golang.org/x/tools/imports", "golang.org/x/net/context",
+    "golang.org/x/net/context/ctxhttp", "github.com/go-openapi/runtime",
+    "golang.org/x/time/rate",
+
+    "github.com/rakyll/statik", "github.com/carbocation/interpose",
+    "github.com/dre1080/recover", "github.com/docker/go-units",
+    "github.com/jessevdk/go-flags", "github.com/go-openapi/runtime",
+    "github.com/aws/aws-sdk-go-v2", "gopkg.in/check.v1",
+    "github.com/jstemmer/go-junit-report", # For CircleCI reporting
+]
+
+#noverify = ["golang.org/x/net", "golang.org/x/tools"]
+
+[[constraint]]
+name = "github.com/petergtz/pegomock"
+
+[[constraint]]
+name = "github.com/stretchr/testify"
+
+[[constraint]]
+name = "github.com/jarcoal/httpmock"
+
+[[constraint]]
+name = "gopkg.in/alecthomas/kingpin.v2"
+
+[[constraint]]
+name = "github.com/spf13/cobra"
+version = "v0.0.3"
+
+[[constraint]]
+name = "github.com/spf13/viper"
+version = "v1.1.0"
+
+[[constraint]]
+name = "github.com/juju/errors.git"
+revision = "22422dad46e14561a0854ad42497a75af9b61909"
+
+[[constraint]]
+name = "github.com/hashicorp/go-hclog"
+
+# HTTP API server
+[[constraint]]
+name = "github.com/go-swagger/go-swagger"
+#version = "0.16.0"
+revision = "fee6df85ab3fce3df91429ccd720d17553def6e8"
+
+# Swagger client deps
+[[constraint]]
+name = "github.com/go-openapi/runtime"
+
+#[[constraint]]
+#name = "golang.org/x/net"
+#branch = "master"
+#source = "github.com/golang/net"
+
+#[[constraint]]
+#name = "golang.org/x/tools"
+#branch = "master"
+#source = "github.com/golang/tools/imports"
+
+[[constraint]]
+name = "github.com/go-openapi/inflect"
+
+[[constraint]]
+name = "github.com/gorilla/handlers"
+
+[[constraint]]
+name = "github.com/toqueteos/webbrowser"
+
+#[[constraint]]
+#name = "golang.org/x/net"
+#source = "github.com/golang/net"
+
+[[constraint]]
+# Used to package the Swagger UI files into the source code
+name = "github.com/rakyll/statik"
+#
+#[[constraint]]
+#name = "github.com/go-openapi/runtime"
+
+[[constraint]]
+name = "github.com/jessevdk/go-flags"
+
+[[constraint]]
+name = "github.com/carbocation/interpose"
+
+[[constraint]]
+name = "github.com/dre1080/recover"
+
+# AWS SDK!
+[[constraint]]
+name = "github.com/aws/aws-sdk-go-v2"
+version = "v2.0.0-preview.4"
+
+# Rich testing
+[[constraint]]
+name = "gopkg.in/check.v1"
+revision = "788fd78401277ebd861206a03c884797c6ec5541"
+
+[prune]
+  go-tests = true
+  non-go = true

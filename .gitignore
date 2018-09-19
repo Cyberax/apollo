@@ -1,0 +1,14 @@
+build
+vendor
+apollo
+mock_*.go
+mocks/matchers/*.go
+.idea
+*.iml
+Gopkg.lock
+server/statik/statik.go
+proto/gen/models
+proto/gen/client
+proto/gen/restapi
+proto/gen/restcli
+proto/gen/merged.yaml

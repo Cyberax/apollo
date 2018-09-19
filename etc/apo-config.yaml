@@ -1,0 +1,31 @@
+# The AWS connector
+aws:
+  region: us-west-2
+  profile: default
+
+# The main DDB database config
+database:
+  # The database type: ddb or mem
+  type: ddb
+  prefix: apo_
+
+# API Listeners
+listen:
+  interface: ::0
+  port: 9443
+  # "Auto" means that we autogenerate the certificate/key
+  # and store it in the database.
+  certfile: auto
+  keyfile: auto
+  # The source of the TLS certificate fingerprint that we present the user.
+  # When a user (or a node) logs in first, the server's response will
+  # contain the root-of-trust certificate for the further TLS requests.
+  # This allows us to do fully authenticated exchange with self-signed certs
+  # without involving real CAs.
+  # Should be either a hostname:port or the special value 'self'
+  probe-host: self
+
+server:
+  # The AWS accounts whitelisted to access the API server
+  whitelisted-accounts:
+    - self # The server's account itself

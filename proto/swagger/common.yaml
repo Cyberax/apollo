@@ -1,0 +1,27 @@
+responses:
+  errorResponse:
+    description: Error
+    schema:
+      $ref: '#/definitions/error'
+
+definitions:
+  error:
+    type: object
+    description: |
+      the error model is a model for all the error responses coming from Apollo
+    required:
+    - message
+    - code
+    properties:
+      code:
+        type: integer
+        description: The error code
+        x-isnullable: false
+      message:
+        description: The error message
+        type: string
+        x-isnullable: false
+      request-id:
+        description: The request ID of the offending request
+        type: string
+        x-isnullable: false

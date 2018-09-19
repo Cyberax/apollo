@@ -1,0 +1,235 @@
+
+paths:
+  /node-list:
+    get:
+      tags:
+        - Node
+      summary: Get the node list
+      description: Get the node list with optional filters
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      parameters:
+        - in: query
+          name: queueName
+          type: string
+        - name: nodeId
+          in: query
+          description: Filter by node ID
+          required: false
+          type: array
+          items:
+            type: string
+      responses:
+        200:
+          description: The list of nodes
+          schema:
+            description: Node list
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                  minLength: 0
+                  x-isnullable: false
+                cloudInstanceId:
+                  type: string
+                  minLength: 0
+                  x-isnullable: false
+                managedNode:
+                  type: boolean
+                  x-isnullable: false
+                nodeState:
+                  $ref: "node.yaml#/definitions/nodeStateEnum"
+                nodeInfo:
+                  $ref: "node.yaml#/definitions/nodeInfo"
+
+        default:
+          $ref: "common.yaml#/responses/errorResponse"
+
+  /node-state:
+    post:
+      tags:
+        - Node
+      summary: Get the current global runner state
+      description: Notify the server about the runner's state
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      parameters:
+      - in: query
+        name: nodeId
+        type: string
+        minLength: 1
+        x-isnullable: false
+      - in: body
+        name: nodeState
+        schema:
+          $ref: "node.yaml#/definitions/nodeInfo"
+      responses:
+        200:
+          description: Everything's OK, keep going on
+        default:
+          $ref: "common.yaml#/responses/errorResponse"
+
+  /unmanaged-node:
+    put:
+      tags:
+        - Node
+      summary: Attach an unmanaged node
+      description: Attach a non-AWS node to a queue
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      parameters:
+        - in: body
+          name: node
+          schema:
+            type: object
+            required:
+              - queue
+            properties:
+              queue:
+                type: string
+                minLength: 0
+                x-isnullable: false
+      responses:
+        200:
+          description: Everything's OK, keep going on
+          schema:
+            type: object
+            x-isnullable: false
+            required:
+              - nodeId
+            properties:
+              nodeId:
+                type: string
+                minLength: 0
+                x-isnullable: false
+        default:
+          $ref: "common.yaml#/responses/errorResponse"
+
+  /node/tasks:
+    post:
+      tags:
+        - Node
+      summary: Synchronize runner state
+      description: Synchronize the runner state with server
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      parameters:
+      - in: query
+        name: instanceId
+        description: Instance ID
+        type: string
+        minLength: 1
+      - name: taskStates
+        description: The state of the tasks on the instance
+        in: body
+        schema:
+          type: array
+          items:
+            $ref: "task.yaml#/definitions/taskStatus"
+      responses:
+        200:
+          description: List of tasks
+          schema:
+            type: array
+            items:
+              type: object
+        default:
+          $ref: "common.yaml#/responses/errorResponse"
+
+definitions:
+  nodeStateEnum:
+    type: string
+    enum: &NodeStateEnum
+    - creating
+    - initializing
+    - active
+    - draining
+    - shutting-down
+    - dead
+
+  nodeInfo:
+    x-isnullable: false
+    description: The state of the instance
+    properties:
+      uptimeSeconds:
+        type: integer
+        minimum: 0
+        x-isnullable: false
+      uptimeSecondsIdle:
+        type: integer
+        minimum: 0
+        x-isnullable: false
+      disks:
+        type: object
+        x-isnullable: false
+        required:
+          - mountPoint
+          - spaceUsedMb
+          - spaceFreeMb
+        properties:
+          mountPoint:
+            type: string
+            minLength: 1
+            x-isnullable: false
+          spaceUsedMb:
+            type: integer
+            minimum: 0
+            x-isnullable: false
+          spaceFreeMb:
+            type: integer
+            minimum: 0
+            x-isnullable: false
+      ram:
+        type: object
+        x-isnullable: false
+#        required:
+#          - ramTotalMb
+#          - ramUsedMb
+#          - ramCacheMb
+#          - swapUsedMb
+#          - swapFreeMb
+        properties:
+          ramTotalMb:
+            type: integer
+            minimum: 0
+            x-isnullable: false
+          ramUsedMb:
+            type: integer
+            minimum: 0
+            x-isnullable: false
+          ramCacheMb:
+            type: integer
+            minimum: 0
+            x-isnullable: false
+          swapUsedMb:
+            type: integer
+            minimum: 0
+            x-isnullable: false
+          swapFreeMb:
+            type: integer
+            minimum: 0
+            x-isnullable: false
+      cpu:
+        type: object
+        x-isnullable: false
+        properties:
+          cpuCount:
+            type: integer
+            minimum: 0
+            x-isnullable: false
+          aggregateCpuLoad:
+            type: number
+            minimum: 0
+            maximum: 100
+            x-isnullable: false
+

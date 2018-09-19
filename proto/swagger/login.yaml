@@ -1,0 +1,81 @@
+paths:
+  /sigv4-login:
+    post:
+      tags:
+      - Login
+      summary: Login and get an auth token
+      description: Logs in with AWS delegated credentials
+      security: [] # No security, this is a login method
+      consumes:
+      - 'application/json'
+      produces:
+      - 'application/json'
+      parameters:
+      - name: "token"
+        in: "body"
+        description: "The signed AWS challenge token"
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        200:
+          description: Login token
+          schema:
+            type: object
+            required:
+            - encryptedAuthToken
+            - encryptedCertificate
+            - serverPublicKey
+            - validUntil
+            properties:
+              encryptedAuthToken:
+                type: string
+                x-isnullable: false
+              encryptedCertificate:
+                type: string
+                x-isnullable: false
+              serverPublicKey:
+                type: string
+                x-isnullable: false
+              validUntil:
+                type: string
+                x-isnullable: false
+                format: "date-time"
+        default:
+          $ref: "common.yaml#/responses/errorResponse"
+
+  /ping:
+    get:
+      tags:
+      - Login
+      summary: Check server connectivity
+      responses:
+        200:
+        default:
+          $ref: "common.yaml#/responses/errorResponse"
+
+  /node-token:
+    get:
+      tags:
+      - Login
+      summary: Create a node-specific authentication token
+      parameters:
+      - name: "node-id"
+        in: "query"
+        description: "The node ID for the token"
+        type: string
+        minLength: 1
+      responses:
+        200:
+          description: Login token
+          schema:
+            type: object
+            properties:
+              authToken:
+                type: string
+                x-isnullable: false
+              certificate:
+                type: string
+                x-isnullable: false
+        default:
+          $ref: "common.yaml#/responses/errorResponse"

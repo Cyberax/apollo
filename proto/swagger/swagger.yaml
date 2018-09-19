@@ -1,0 +1,38 @@
+swagger: "2.0"
+
+produces:
+- application/json
+schemes:
+- https
+consumes:
+- application/json
+
+info:
+  version: 1.0.0
+  title: Apollo API
+  description: The Apollo API used by utilities
+
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    in: header
+    name: X-Apollo-Token
+
+# Require API key auth for all methods by default
+security:
+- ApiKeyAuth: []
+
+# This key is used to add links to the individual merged files
+x-paths:
+  - merge:
+      # Auth-related methods
+      $ref: 'login.yaml#/'
+  - merge:
+      # Queue-related operations
+      $ref: 'queue.yaml#/'
+  - merge:
+      # Task-related ops
+      $ref: 'task.yaml#/'
+  - merge:
+      # Node-related ops
+      $ref: 'node.yaml#/nodes.yaml'
